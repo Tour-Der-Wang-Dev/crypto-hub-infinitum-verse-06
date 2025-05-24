@@ -5,12 +5,11 @@ import { Cloud, CloudRain, CloudSnow, Sun, CloudLightning, Wind } from 'lucide-r
 
 interface WeatherDisplayProps {
   className?: string;
-  lat?: number;
-  lon?: number;
+  city?: string;
 }
 
-const WeatherDisplay = ({ className, lat, lon }: WeatherDisplayProps) => {
-  const { weather, loading, error } = useWeather(lat, lon);
+const WeatherDisplay = ({ className, city = "London" }: WeatherDisplayProps) => {
+  const { weather, loading, error } = useWeather(city);
 
   if (loading) {
     return (
@@ -51,6 +50,25 @@ const WeatherDisplay = ({ className, lat, lon }: WeatherDisplayProps) => {
     }
   };
 
+  const getConditionDescription = (condition: string) => {
+    switch (condition) {
+      case 'clear':
+        return 'Clear sky';
+      case 'clouds':
+        return 'Cloudy';
+      case 'rain':
+        return 'Rainy';
+      case 'snow':
+        return 'Snowy';
+      case 'storm':
+        return 'Stormy';
+      case 'mist':
+        return 'Misty';
+      default:
+        return 'Clear';
+    }
+  };
+
   return (
     <Card className={`card-glass overflow-hidden ${className || ''}`}>
       <CardContent className="flex items-center p-4 h-full">
@@ -58,9 +76,9 @@ const WeatherDisplay = ({ className, lat, lon }: WeatherDisplayProps) => {
           {getWeatherIcon()}
         </div>
         <div>
-          <p className="text-xs text-gray-400">{weather.city}</p>
+          <p className="text-xs text-gray-400">{weather.location}</p>
           <p className="text-2xl font-bold text-white">{weather.temperature}°C</p>
-          <p className="text-sm text-gray-300">{weather.description}</p>
+          <p className="text-sm text-gray-300">{getConditionDescription(weather.condition)}</p>
         </div>
       </CardContent>
     </Card>
