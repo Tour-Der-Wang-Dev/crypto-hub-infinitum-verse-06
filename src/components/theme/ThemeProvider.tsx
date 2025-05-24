@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode, useCallback, useMemo } from 'react';
 
 interface ThemeContextType {
   mode: 'day' | 'night';
@@ -26,7 +26,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   const [mode, setMode] = useState<'day' | 'night'>('day');
   const [isAutoMode, setIsAutoMode] = useState(true);
 
-  const getTimeBasedMode = React.useCallback((): 'day' | 'night' => {
+  const getTimeBasedMode = useCallback((): 'day' | 'night' => {
     const hour = new Date().getHours();
     return (hour >= 6 && hour < 18) ? 'day' : 'night';
   }, []);
@@ -51,24 +51,24 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     root.classList.add(`theme-${mode}`);
   }, [mode]);
 
-  const toggleMode = React.useCallback(() => {
+  const toggleMode = useCallback(() => {
     setIsAutoMode(false);
     setMode(current => current === 'day' ? 'night' : 'day');
   }, []);
 
-  const setAutoMode = React.useCallback((auto: boolean) => {
+  const setAutoModeCallback = useCallback((auto: boolean) => {
     setIsAutoMode(auto);
     if (auto) {
       setMode(getTimeBasedMode());
     }
   }, [getTimeBasedMode]);
 
-  const value = React.useMemo(() => ({
+  const value = useMemo(() => ({
     mode,
     toggleMode,
     isAutoMode,
-    setAutoMode
-  }), [mode, toggleMode, isAutoMode, setAutoMode]);
+    setAutoMode: setAutoModeCallback
+  }), [mode, toggleMode, isAutoMode, setAutoModeCallback]);
 
   return (
     <ThemeContext.Provider value={value}>
