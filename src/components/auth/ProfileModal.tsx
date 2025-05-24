@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { User, Mail, UserCheck } from 'lucide-react';
+import { User, Mail, UserCheck, Wallet } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const ProfileModal = () => {
