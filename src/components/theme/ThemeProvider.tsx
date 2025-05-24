@@ -1,5 +1,5 @@
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
 interface ThemeContextType {
   mode: 'day' | 'night';
@@ -22,14 +22,14 @@ interface ThemeProviderProps {
   children: ReactNode;
 }
 
-export const ThemeProvider = ({ children }: ThemeProviderProps) => {
+export function ThemeProvider({ children }: ThemeProviderProps) {
   const [mode, setMode] = useState<'day' | 'night'>('day');
   const [isAutoMode, setIsAutoMode] = useState(true);
 
-  const getTimeBasedMode = (): 'day' | 'night' => {
+  const getTimeBasedMode = React.useCallback((): 'day' | 'night' => {
     const hour = new Date().getHours();
     return (hour >= 6 && hour < 18) ? 'day' : 'night';
-  };
+  }, []);
 
   useEffect(() => {
     if (isAutoMode) {
@@ -42,7 +42,7 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
       return () => clearInterval(interval);
     }
-  }, [isAutoMode]);
+  }, [isAutoMode, getTimeBasedMode]);
 
   useEffect(() => {
     // Apply theme classes to document
@@ -51,21 +51,28 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     root.classList.add(`theme-${mode}`);
   }, [mode]);
 
-  const toggleMode = () => {
+  const toggleMode = React.useCallback(() => {
     setIsAutoMode(false);
-    setMode(mode === 'day' ? 'night' : 'day');
-  };
+    setMode(current => current === 'day' ? 'night' : 'day');
+  }, []);
 
-  const setAutoMode = (auto: boolean) => {
+  const setAutoMode = React.useCallback((auto: boolean) => {
     setIsAutoMode(auto);
     if (auto) {
       setMode(getTimeBasedMode());
     }
-  };
+  }, [getTimeBasedMode]);
+
+  const value = React.useMemo(() => ({
+    mode,
+    toggleMode,
+    isAutoMode,
+    setAutoMode
+  }), [mode, toggleMode, isAutoMode, setAutoMode]);
 
   return (
-    <ThemeContext.Provider value={{ mode, toggleMode, isAutoMode, setAutoMode }}>
+    <ThemeContext.Provider value={value}>
       {children}
     </ThemeContext.Provider>
   );
-};
+}
