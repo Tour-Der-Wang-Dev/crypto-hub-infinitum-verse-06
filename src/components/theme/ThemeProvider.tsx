@@ -1,5 +1,6 @@
 
-import React, { createContext, useContext, useEffect, useState, ReactNode, useCallback, useMemo } from 'react';
+import * as React from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback, useMemo } from 'react';
 
 interface ThemeContextType {
   mode: 'day' | 'night';
@@ -23,6 +24,12 @@ interface ThemeProviderProps {
 }
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
+  // Add safety check for React
+  if (!React || typeof React.useState !== 'function') {
+    console.error('React is not properly loaded');
+    return <div>{children}</div>;
+  }
+
   const [mode, setMode] = useState<'day' | 'night'>('day');
   const [isAutoMode, setIsAutoMode] = useState(true);
 

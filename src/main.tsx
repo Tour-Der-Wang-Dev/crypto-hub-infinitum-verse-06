@@ -1,5 +1,5 @@
 
-import React from 'react';
+import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
@@ -26,5 +26,10 @@ if (!container) {
   throw new Error('Root element not found');
 }
 
+// Add safety check for React before rendering
+if (!React || typeof React.createElement !== 'function') {
+  throw new Error('React is not properly loaded');
+}
+
 const root = createRoot(container);
-root.render(<App />);
+root.render(React.createElement(App));
