@@ -1,114 +1,81 @@
-
 import { useState, useEffect } from 'react';
 
 export interface WeatherData {
   temperature: number;
   condition: 'clear' | 'clouds' | 'rain' | 'snow' | 'storm' | 'mist';
-  city: string;
-  iconUrl: string;
-  description: string;
+  humidity: number;
+  windSpeed: number;
+  location: string;
 }
 
-export const useWeather = (lat?: number, lon?: number) => {
+export const useWeather = (city?: string) => {
   const [weather, setWeather] = useState<WeatherData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchWeather = async () => {
+      if (!city) {
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+
       try {
-        setLoading(true);
-        // For now, we'll use mock weather data
-        // In a production app, this would use an API like OpenWeatherMap
-        
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        const apiKey = process.env.REACT_APP_WEATHER_API_KEY;
+        if (!apiKey) {
+          throw new Error("Weather API key is not defined in environment variables.");
+        }
+        const response = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`
+        );
 
-        // Generate mock weather based on time of day
-        const hour = new Date().getHours();
-        let condition: WeatherData['condition'];
-        let temperature: number;
-        let description: string;
-        
-        // Randomize weather a bit
-        const random = Math.random();
-        
-        if (hour >= 6 && hour < 18) {
-          // Daytime
-          if (random > 0.7) {
-            condition = 'clouds';
-            description = 'Partly cloudy';
-          } else {
-            condition = 'clear';
-            description = 'Clear sky';
-          }
-          temperature = 22 + Math.floor(random * 10);
-        } else {
-          // Nighttime
-          if (random > 0.8) {
-            condition = 'rain';
-            description = 'Light rain';
-          } else if (random > 0.5) {
-            condition = 'clouds';
-            description = 'Cloudy';
-          } else {
-            condition = 'clear';
-            description = 'Clear night';
-          }
-          temperature = 15 + Math.floor(random * 7);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        // Determine icon based on condition and time
-        const isDaytime = hour >= 6 && hour < 18;
-        let iconUrl = '';
-        
-        switch (condition) {
-          case 'clear':
-            iconUrl = isDaytime ? '01d.png' : '01n.png';
-            break;
-          case 'clouds':
-            iconUrl = isDaytime ? '03d.png' : '03n.png';
-            break;
-          case 'rain':
-            iconUrl = isDaytime ? '10d.png' : '10n.png';
-            break;
-          case 'snow':
-            iconUrl = isDaytime ? '13d.png' : '13n.png';
-            break;
-          case 'storm':
-            iconUrl = isDaytime ? '11d.png' : '11n.png';
-            break;
-          case 'mist':
-            iconUrl = isDaytime ? '50d.png' : '50n.png';
-            break;
-        }
-
-        // Use placeholder icons for now (in a real app, use real URLs)
-        iconUrl = `/placeholder.svg`;
+        const data = await response.json();
 
         setWeather({
-          temperature,
-          condition,
-          city: 'Bangkok',
-          iconUrl,
-          description,
+          temperature: data.main.temp,
+          condition: mapCondition(data.weather[0].main),
+          humidity: data.main.humidity,
+          windSpeed: data.wind.speed,
+          location: data.name,
         });
-        
-        setLoading(false);
-      } catch (err) {
-        console.error('Failed to fetch weather:', err);
-        setError('Failed to fetch weather data');
+      } catch (e: any) {
+        setError(e.message);
+      } finally {
         setLoading(false);
       }
     };
 
     fetchWeather();
+  }, [city]);
 
-    // Refresh every 30 minutes
-    const interval = setInterval(fetchWeather, 30 * 60 * 1000);
-
-    return () => clearInterval(interval);
-  }, [lat, lon]);
+  const mapCondition = (condition: string): WeatherData['condition'] => {
+    const lowerCondition = condition.toLowerCase();
+    if (lowerCondition.includes('clear') || lowerCondition.includes('sunny')) {
+      return 'clear';
+    }
+    if (lowerCondition.includes('cloud')) {
+      return 'clouds';
+    }
+    if (lowerCondition.includes('rain') || lowerCondition.includes('drizzle')) {
+      return 'rain';
+    }
+    if (lowerCondition.includes('snow')) {
+      return 'snow';
+    }
+    if (lowerCondition.includes('storm') || lowerCondition.includes('thunder')) {
+      return 'storm';
+    }
+    if (lowerCondition.includes('mist') || lowerCondition.includes('fog')) {
+      return 'mist';
+    }
+    return 'clear'; // default fallback
+  };
 
   return { weather, loading, error };
 };
