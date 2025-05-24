@@ -54,6 +54,9 @@ const Footer = () => {
               <Link to="/help" className="block text-sm text-gray-400 hover:text-infi-gold transition-colors">
                 Help Center
               </Link>
+              <Link to="/docs" className="block text-sm text-gray-400 hover:text-infi-gold transition-colors">
+                Documentation
+              </Link>
             </div>
           </div>
 

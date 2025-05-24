@@ -17,6 +17,7 @@ import DashboardPage from '@/pages/DashboardPage';
 import AdminPage from '@/pages/AdminPage';
 import LoginPage from '@/pages/LoginPage';
 import ProfilePage from '@/pages/ProfilePage';
+import DocsPage from '@/pages/DocsPage';
 import NotFound from '@/pages/NotFound';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import { Toaster } from '@/components/ui/toaster';
@@ -36,6 +37,7 @@ function App() {
               <Route path="/services" element={<ServicesPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/help" element={<HelpPage />} />
+              <Route path="/docs" element={<DocsPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/map" element={<MapPage />} />
               <Route path="/marketplace" element={<MarketplacePage />} />
