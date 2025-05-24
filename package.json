@@ -46,6 +46,7 @@
     "@testing-library/react": "^14.2.2",
     "@testing-library/user-event": "^14.5.2",
     "@types/dompurify": "^3.2.0",
+    "@types/ethereum-protocol": "^1.0.5",
     "@vitest/coverage-v8": "^1.4.0",
     "axe-core": "^4.9.1",
     "class-variance-authority": "^0.7.1",

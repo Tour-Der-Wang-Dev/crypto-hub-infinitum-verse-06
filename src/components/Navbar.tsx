@@ -6,9 +6,13 @@ import { Map, Marketplace, Freelance, Travel } from '@/components/custom-icons';
 import { Link } from 'react-router-dom';
 import InfinityLogo from '@/components/InfinityLogo';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import WalletConnect from '@/components/auth/WalletConnect';
+import ProfileModal from '@/components/auth/ProfileModal';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user } = useAuth();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-infi-dark/90 backdrop-blur-md border-b border-infi-gold/20">
@@ -33,19 +37,22 @@ const Navbar = () => {
           <Link to="/travel" className="px-3 py-2 rounded-md text-sm flex items-center gap-1.5 hover:bg-infi-blue/30 transition-colors">
             <Travel size={16} /> Travel
           </Link>
-          <Link to="/dashboard" className="px-3 py-2 rounded-md text-sm hover:bg-infi-blue/30 transition-colors">
-            Dashboard
-          </Link>
-          <Link to="/admin" className="px-3 py-2 rounded-md text-sm hover:bg-infi-blue/30 transition-colors">
-            Admin
-          </Link>
+          {user && (
+            <>
+              <Link to="/dashboard" className="px-3 py-2 rounded-md text-sm hover:bg-infi-blue/30 transition-colors">
+                Dashboard
+              </Link>
+              <Link to="/admin" className="px-3 py-2 rounded-md text-sm hover:bg-infi-blue/30 transition-colors">
+                Admin
+              </Link>
+            </>
+          )}
         </div>
 
         <div className="hidden md:flex items-center gap-2">
           <ThemeToggle />
-          <Button className="gold-gradient animate-pulse-gold">
-            Connect Wallet
-          </Button>
+          {user && <ProfileModal />}
+          <WalletConnect />
         </div>
 
         {/* Mobile menu button */}
@@ -92,24 +99,33 @@ const Navbar = () => {
             >
               <Travel size={18} /> Travel
             </Link>
-            <Link
-              to="/dashboard"
-              className="block px-3 py-2 rounded-md text-base font-medium hover:bg-infi-blue/30 transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Dashboard
-            </Link>
-            <Link
-              to="/admin"
-              className="block px-3 py-2 rounded-md text-base font-medium hover:bg-infi-blue/30 transition-colors"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Admin
-            </Link>
+            {user && (
+              <>
+                <Link
+                  to="/dashboard"
+                  className="block px-3 py-2 rounded-md text-base font-medium hover:bg-infi-blue/30 transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  to="/admin"
+                  className="block px-3 py-2 rounded-md text-base font-medium hover:bg-infi-blue/30 transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Admin
+                </Link>
+                <Link
+                  to="/profile"
+                  className="block px-3 py-2 rounded-md text-base font-medium hover:bg-infi-blue/30 transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Profile
+                </Link>
+              </>
+            )}
             <div className="pt-2">
-              <Button className="gold-gradient animate-pulse-gold w-full">
-                Connect Wallet
-              </Button>
+              <WalletConnect />
             </div>
           </div>
         </div>
